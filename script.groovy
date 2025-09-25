@@ -1,12 +1,12 @@
-def buildApp() {
+def buildAPP() {
     echo 'building the application...'
 }
 
-def testApp() {
+def testAPP() {
     echo 'testing the application...'
 }
 
-def deployApp() {
+def deployAPP() {
     echo 'deploying the application...'
     echo "deploying version ${params.VERSION}"
 }
