@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script{
                     echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordvariable: 'PASS', usernameVariable: 'USER')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                         sh 'docker build -t snrmartins/jenkins-app:20-alpine .'
                         sh 'echo $PASS | docker login -u $USER --password-stdin'
                         sh 'docker push snrmartins/jenkins-app:20-alpine'
