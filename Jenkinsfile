@@ -29,7 +29,7 @@ pipeline {
         stage('Build and Push docker image') {
             steps {
                 script{
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                         sh 'docker build -t snrmartins/java-maven-app:20-alpine .'
                         sh 'echo $PASS | docker login -u $USER --password-stdin'
                         sh 'docker push snrmartins/java-maven-app:20-alpine'
