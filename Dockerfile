@@ -1,20 +1,6 @@
-# Use Node 20 Alpine for smaller image
-FROM node:20-alpine
-
-# Create app directory
-WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json first (for caching)
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the app
-COPY . .
-
-# Expose port
-EXPOSE 3000
-
-# Start the app
-CMD ["node", "server.js"]
+FROM openjdk:17.0.2-jdk
+EXPOSE 8080
+RUN mkdir /opt/app
+COPY build/libs/docker-exercises-project-1.0-SNAPSHOT.jar /opt/app
+WORKDIR /opt/app
+CMD ["java", "-jar", "docker-exercises-project-1.0-SNAPSHOT.jar"]
