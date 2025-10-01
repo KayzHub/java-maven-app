@@ -1,8 +1,20 @@
-FROM amazoncorretto:8-alpine3.17-jre
+# Use Node 20 Alpine for smaller image
+FROM node:20-alpine
 
-EXPOSE 8080
+# Create app directory
+WORKDIR /usr/src/app
 
-COPY ./target/java-maven-app-*.jar /usr/app/
-WORKDIR /usr/app
+# Copy package.json and package-lock.json first (for caching)
+COPY package*.json ./
 
-CMD java -jar java-maven-app-*.jar
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the app
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start the app
+CMD ["node", "server.js"]
