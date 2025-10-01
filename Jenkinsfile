@@ -1,12 +1,16 @@
 pipeline {
     agent any
     tools {
-        nodejs "node"
+        nodejs "node" // make sure Jenkins NodeJS tool is configured
+    }
+    environment {
+        IMAGE_NAME = ""
     }
     stages {
-        stage("increment version") {
+        stage("Increment version") {
             steps {
                 script {
+                    // Working in root since package.json is at root
                     sh "npm version minor --no-git-tag-version"
                     def packagejson = readJSON file: 'package.json'
                     def version = packagejson.version
@@ -14,7 +18,8 @@ pipeline {
                 }
             }
         }
-        stage('Run tests') {
+
+        stage("Install dependencies & Run tests") {
             steps {
                 script {
                     sh "npm install"
@@ -22,18 +27,20 @@ pipeline {
                 }
             }
         }
-        stage('Build and Push docker image') {
+
+        stage("Build & Push Docker image") {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                        sh "docker build -t snrmartins/java-maven-app:${env.IMAGE_NAME} ."
+                        sh "docker build -t snrmartins/my-node-app:${env.IMAGE_NAME} ."
                         sh "echo $PASS | docker login -u $USER --password-stdin"
-                        sh "docker push snrmartins/java-maven-app:${env.IMAGE_NAME}"
+                        sh "docker push snrmartins/my-node-app:${env.IMAGE_NAME}"
                     }
                 }
             }
         }
-        stage('commit version update') {
+
+        stage("Commit version update") {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'gitlab-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
@@ -41,7 +48,7 @@ pipeline {
                         sh 'git config --global user.name "jenkins"'
                         sh 'git add package.json'
                         sh 'git commit -m "ci: version bump" || echo "No changes to commit"'
-                        sh 'git push origin HEAD:jenkins-jobs'
+                        sh 'git push https://$USER:$PASS@gitlab.com/SnrMartins/your-nodejs-repo.git HEAD:main'
                     }
                 }
             }
