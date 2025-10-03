@@ -6,7 +6,7 @@ def gv
 pipeline {
     agent any
     tools {
-        maven 'Maven'
+        maven 'maven-3.9'
     }
     stages {
         stage("init") {
@@ -23,12 +23,10 @@ pipeline {
                 }
             }
         }
-        stage("build and push image") {
+        stage("build image") {
             steps {
                 script{
-                    buildImage 'snrmartins/java-maven-app:20-alpine'
-                    dockerLogin()
-                    dockerPush 'snrmartins/java-maven-app:20-alpine'
+                    buildImage()
                 }
             }
         }
