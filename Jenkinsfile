@@ -8,6 +8,9 @@ pipeline {
     tools {
         maven 'maven-3.9'
     }
+    environment {
+        branchName = "${env.BRANCH_NAME}"
+    }
     stages {
         stage("init") {
             steps {
