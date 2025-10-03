@@ -1,12 +1,12 @@
 #!/user/bin/env groovy
 
-@Library('jenkins-shared-library') _
+@library('jenkins-shared-library') _
 def gv
 
 pipeline {
     agent any
     tools {
-        maven 'maven-3.9'
+        maven 'Maven'
     }
     stages {
         stage("init") {
@@ -23,10 +23,12 @@ pipeline {
                 }
             }
         }
-        stage("build image") {
+        stage("build and push image") {
             steps {
                 script{
-                    buildImage()
+                    buildImage 'snrmartins/java-maven-app:20-alpine'
+                    dockerLogin()
+                    dockerPush 'snrmartins/java-maven-app:20-alpine'
                 }
             }
         }
