@@ -29,9 +29,9 @@ pipeline {
                     def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
                     def imageTag = "snrmartins/java-maven-app:${version}-alpine"
                     echo "Building Docker image with tag: ${imageTag}"
-                    buildImage(imageTag)
+                    buildImage(version)
                     dockerLogin()
-                    dockerPush(imageTag)
+                    dockerPush(version)
                 }
             }
         }
