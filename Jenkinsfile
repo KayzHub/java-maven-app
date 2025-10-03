@@ -23,10 +23,12 @@ pipeline {
                 }
             }
         }
-        stage("build image") {
+        stage("build and push image") {
             steps {
                 script{
-                    buildImage()
+                    buildImage 'snrmartins/java-maven-app:20-alpine'
+                    dockerLogin()
+                    dockerPush 'snrmartins/java-maven-app:20-alpine'
                 }
             }
         }
