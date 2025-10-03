@@ -26,9 +26,9 @@ pipeline {
         stage("build and push image") {
             steps {
                 script{
-                    buildImage 'snrmartins/java-maven-app:20-alpine'
+                    buildImage 'snrmartins/java-maven-app:1.0'
                     dockerLogin()
-                    dockerPush 'snrmartins/java-maven-app:20-alpine'
+                    dockerPush 'snrmartins/java-maven-app:1.0'
                 }
             }
         }
