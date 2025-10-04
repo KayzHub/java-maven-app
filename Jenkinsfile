@@ -1,24 +1,11 @@
-#!/usr/bin/env groovy
-
-library(
-  identifier: 'jenkins-shared-library@master',
-  retriever: modernSCM([
-    $class: 'GitSCMSource',
-    remote: 'https://gitlab.com/SnrMartins/jenkins-shared-library.git',
-    credentialsId: 'gitlab-credentials'
-  ])
-)
-
-def gv
+@Library('jenkins-shared-library') _
 
 pipeline {
     agent any
     tools {
         maven 'maven-3.9'
     }
-    environment {
-        branchName = "${env.BRANCH_NAME}"
-    }
+
     stages {
         stage("init") {
             steps {
@@ -27,25 +14,27 @@ pipeline {
                 }
             }
         }
+
         stage("build jar") {
             steps {
-                script{
-                    buildJar()
+                script {
+                    buildJar()   // this comes from shared library too
                 }
             }
         }
-        stage("build and push image") {
-    steps {
-        script {
-            buildAndPush("snrmartins/java-maven-app")
 
+        stage("build and push image") {
+            steps {
+                script {
+                    buildAndPush("snrmartins/java-maven-app")   // ✅ from shared lib
                 }
             }
         }
+
         stage("deploy") {
             steps {
-                script{
-                    gv.deployApp()
+                script {
+                    gv.deployApp()  // also from shared library
                 }
             }
         }
