@@ -1,32 +1,18 @@
-@Library('jenkins-shared-library') _
-
-pipeline {
+pipeline {   
     agent any
-    tools {
-        maven 'maven-3.9'
-    }
-
     stages {
-        stage("init") {
+        stage("test") {
             steps {
                 script {
-                    gv = load "script.groovy"
+                    echo "Testing the application...."
                 }
             }
         }
-
-        stage("build jar") {
+        
+        stage("build") {
             steps {
                 script {
-                    buildJar()   // this comes from shared library too
-                }
-            }
-        }
-
-        stage("build and push image") {
-            steps {
-                script {
-                    buildAndPush("snrmartins/java-maven-app")   // ✅ from shared lib
+                    echo "Building the application...."
                 }
             }
         }
@@ -34,9 +20,9 @@ pipeline {
         stage("deploy") {
             steps {
                 script {
-                    gv.deployApp()  // also from shared library
+                    echo "Deploying the application...."
                 }
             }
-        }
+        }               
     }
-}
+} 
