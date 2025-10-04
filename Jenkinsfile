@@ -35,14 +35,10 @@ pipeline {
             }
         }
         stage("build and push image") {
-            steps {
-                script{
-                    def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-                    def imageTag = "snrmartins/java-maven-app:${version}-alpine"
-                    echo "Building Docker image with tag: ${imageTag}"
-                    buildImage(version)
-                    dockerLogin()
-                    dockerPush(version)
+    steps {
+        script {
+            buildAndPush("snrmartins/java-maven-app")
+
                 }
             }
         }
