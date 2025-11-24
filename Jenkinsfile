@@ -1,18 +1,43 @@
 pipeline {   
     agent any
+    tools {
+        maven 'Maven'
+    }
     stages {
-        stage("test") {
+        stage("increment version") {
             steps {
                 script {
-                    echo "Testing the application...."
+                echo 'incrementing app version...'
+                    sh 'mvn build-helper:parse-version versions:set \
+                        -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
+                        versions:commit'
+                        def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                        def version = matcher[0][1]
+                        env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+
                 }
             }
         }
-        
-        stage("build") {
+        stage("build app") {
             steps {
                 script {
-                    echo "Building the application...."
+                echo 'building the application...'
+                sh 'mvn clean package'
+
+
+
+                }
+            }
+        }
+
+        stage("build image") {
+            steps {
+                script {
+                    echo "building the docker image..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                    sh "docker build -t adnanahm750/demo-app:${IMAGE_NAME} ."
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    sh "docker push adnanahm750/demo-app:${IMAGE_NAME}"
                 }
             }
         }
@@ -20,7 +45,11 @@ pipeline {
         stage("deploy") {
             steps {
                 script {
-                    echo "Deploying the application...."
+                    def dockerCmd = 'docker run -p 3080:3080 -d adnanahmed780/demo-app:latest '
+                    sshagent(['ec2-server-key']) {
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@13.41.188.156 ${dockerCmd}"
+                    }
+                   
                 }
             }
         }               
