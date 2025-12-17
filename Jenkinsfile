@@ -1,9 +1,7 @@
-def gv
-
 pipeline {
     agent any
     tools {
-        maven 'Maven'
+        maven 'Maven'  // Make sure Maven is configured in Jenkins under Global Tool Configuration
     }
     stages {
         stage('increment version') {
@@ -46,7 +44,7 @@ pipeline {
                 }
             }
         }
-        stage('commit version update'){
+        stage('commit version update') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'gitlab-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
@@ -64,7 +62,6 @@ pipeline {
                     }
                 }
             }
-         }
         }
     }
 }
