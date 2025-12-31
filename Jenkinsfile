@@ -1,43 +1,41 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'maven-3.9'
-    }
-
     stages {
 
-        stage('build jar') {
+        stage("test") {
             steps {
                 script {
-                    echo "building the application..."
-                    sh 'mvn package'
+                    echo "Testing the application..."
+                    echo "Executing pipeline for branch ${BRANCH_NAME}"
                 }
             }
         }
 
-        stage('build image') {
+        stage("build") {
+            when {
+                expression {
+                    BRANCH_NAME == "master"
+                }
+            }
             steps {
                 script {
-                    echo "building the docker image..."
-                    withCredentials([usernamePassword(
-                        credentialsId: 'docker-hub-repo',
-                        usernameVariable: 'USER',
-                        passwordVariable: 'PASS'
-                    )]) {
-                        // tag with build number (simple + reliable)
-                        sh "docker build -t valenciadev/demo-app:${env.BUILD_NUMBER} ."
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push valenciadev/demo-app:${env.BUILD_NUMBER}"
-                    }
+                    echo "Building the application..."
+                    // later you can add: sh 'mvn package'
                 }
             }
         }
 
-        stage('deploy') {
+        stage("deploy") {
+            when {
+                expression {
+                    BRANCH_NAME == "master"
+                }
+            }
             steps {
                 script {
-                    echo "deploying the application..."
+                    echo "Deploying the application..."
+                    // later you can add real deploy steps
                 }
             }
         }
