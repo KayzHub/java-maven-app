@@ -6,27 +6,13 @@ pipeline {
     }
 
     stages {
-        stage('increment version') {
+
+        stage('build jar') {
             steps {
                 script {
-                    echo 'incrementing app version...'
-                    sh '''
-                      mvn build-helper:parse-version versions:set \
-                        -DnewVersion=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion} \
-                        versions:commit
-                    '''
-
-                    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                    def version = matcher[0][1]
-                    env.IMAGE_NAME = "${version}-${env.BUILD_NUMBER}"
+                    echo "building the application..."
+                    sh 'mvn package'
                 }
-            }
-        }
-
-        stage('build app') {
-            steps {
-                echo 'building the application...'
-                sh 'mvn clean package'
             }
         }
 
@@ -36,12 +22,13 @@ pipeline {
                     echo "building the docker image..."
                     withCredentials([usernamePassword(
                         credentialsId: 'docker-hub-repo',
-                        passwordVariable: 'PASS',
-                        usernameVariable: 'USER'
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
                     )]) {
-                        sh "docker build -t valenciadev/demo-app:${env.IMAGE_NAME} ."
+                        // tag with build number (simple + reliable)
+                        sh "docker build -t valenciadev/demo-app:${env.BUILD_NUMBER} ."
                         sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push valenciadev/demo-app:${env.IMAGE_NAME}"
+                        sh "docker push valenciadev/demo-app:${env.BUILD_NUMBER}"
                     }
                 }
             }
@@ -49,7 +36,9 @@ pipeline {
 
         stage('deploy') {
             steps {
-                echo 'deploying docker image...'
+                script {
+                    echo "deploying the application..."
+                }
             }
         }
     }
