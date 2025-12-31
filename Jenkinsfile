@@ -32,9 +32,9 @@ pipeline {
                 script {
                     echo "building the docker image..."
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                        sh "docker build -t nanatwn/demo-app:${IMAGE_NAME} ."
+                        sh "docker build -t valenciadev/demo-app:${IMAGE_NAME} ."
                         sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push nanatwn/demo-app:${IMAGE_NAME}"
+                        sh "docker push valenciadev/demo-app:${IMAGE_NAME}"
                     }
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
                         sh 'git branch'
                         sh 'git config --list'
 
-                        sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/twn-devops-bootcamp/latest/08-jenkins/java-maven-app.git"
+                        sh "git remote set-url origin sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/devops-portfolio2822151/java-maven-app.git"
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump"'
                         sh 'git push origin HEAD:jenkins-jobs'
