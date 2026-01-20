@@ -19,6 +19,7 @@ pipeline {
                 }
             }
         }
+
         stage('build app') {
             steps {
                 script {
@@ -27,6 +28,7 @@ pipeline {
                 }
             }
         }
+
         stage('build image') {
             steps {
                 script {
@@ -39,6 +41,7 @@ pipeline {
                 }
             }
         }
+
         stage('deploy') {
             steps {
                 script {
@@ -46,6 +49,7 @@ pipeline {
                 }
             }
         }
+
         stage('commit version update'){
             steps {
                 script {
@@ -64,7 +68,6 @@ pipeline {
                     }
                 }
             }
-         }
         }
     }
 }
