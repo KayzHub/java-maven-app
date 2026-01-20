@@ -7,6 +7,15 @@ Install Jenkins on the instance with the following command:
 docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins:lts-jdk21
 ```
 
+Configure Maven (as a tool via Jenkins UI).
+
+Also, install Nodejs with the following command:
+```
+curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+
+sh nodesource_setup.sh
+```
+
 This repo contains a standard Maven project layout (`src/main/...`) plus build configuration (`pom.xml`) and a Jenkins pipeline definition (`Jenkinsfile`). 
 
 ---
