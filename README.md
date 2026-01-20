@@ -171,6 +171,9 @@ Now go back to host and restart jenkins container.
 ```
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 docker build -t devjumpstart/demo-app:1.0 .
-docker push devjumpstart/demo-app
+docker push devjumpstart/demo-app:1.0
 ```
 For the above to work, you need to specify the username/password as env (you have to create credentials to be passed into the env).
+
+<img width="425" height="185" alt="image" src="https://github.com/user-attachments/assets/02320b0f-fe87-40be-b14f-d2f3c6789485" />
+
