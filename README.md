@@ -166,3 +166,11 @@ End of guide.
 
 
 Now go back to host and restart jenkins container.
+
+## Add step in Jenkins UI to build image and push to dockerhub. I am using private registry (change devjumpstart to your dockerhub account name).
+```
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+docker build -t devjumpstart/demo-app:1.0 .
+docker push devjumpstart/demo-app
+```
+For the above to work, you need to specify the username/password as env (you have to create credentials to be passed into the env).
