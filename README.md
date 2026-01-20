@@ -9,7 +9,8 @@ docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --re
 
 Configure Maven (as a tool via Jenkins UI).
 
-Also, install Nodejs with the following command:
+Also, install Nodejs (inside the jenkins container - as root user) with the following command:
+docker exec -it -u 0 #JenkinsContainerID /bin/bash
 ```
 curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 
