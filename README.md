@@ -5,6 +5,7 @@ A simple Java application built with **Apache Maven**, with a **Jenkins Pipeline
 Install Jenkins on the instance with the following command:
 ```bash
 docker run -d -v jenkins_home:/var/jenkins_home -p 8080:8080 -p 50000:50000 --restart=on-failure jenkins/jenkins:lts-jdk21
+#instructions to run docker commands from jenkins container is further down below
 ```
 
 Configure Maven (as a tool via Jenkins UI).
@@ -50,3 +51,118 @@ mvn clean test
 
 mvn clean package
 # Maven uses this command to generate artifacts in the target/. folder.
+```
+
+---
+
+## Making Docker installation from AWS machine available in Jenkins container for jobs
+From the AWS machine run the follwing command:
+```
+docker run -p 8080:8080 -p 50000:50000 -d \
+-v jenkins_home:/var/jenkins_home \
+-v /var/run/docker.sock:/var/run/docker.sock jenkins/jenkins:lts-jdk21
+```
+
+From inside the jenkins container (as root user - "-u 0", run the following commands:
+```
+groupadd docker
+usermod -aG docker jenkins
+apt-get update && apt-get install -y docker.io #to install docker cli, so you can talk to docker daemon
+exit
+```
+
+If you restart the jenkins container and run into the error below:
+# Jenkins Docker Socket Permission Error – Quick Fix Guide
+
+## Error
+
+```
+permission denied while trying to connect to the Docker daemon socket
+```
+
+when running Docker commands from Jenkins (running inside a container).
+
+---
+
+## Cause (1 sentence)
+
+The `docker` group inside the Jenkins container has a **different numeric GID** than the `docker` group on the host that owns `/var/run/docker.sock`.
+
+Linux checks **numbers, not group names**.
+
+---
+
+## Verify
+
+### On host
+
+```bash
+getent group docker
+ls -l /var/run/docker.sock
+```
+
+### Inside container
+
+```bash
+getent group docker
+ls -l /var/run/docker.sock
+groups jenkins
+```
+
+If the GIDs differ → this is the problem.
+
+---
+
+## Fix (production‑safe)
+
+### 1. Get host docker GID
+
+```bash
+DOCKER_GID=$(getent group docker | cut -d: -f3)
+echo $DOCKER_GID
+#Please note the above value as you will need it in the next step
+```
+
+### 2. Fix inside Jenkins container (as root)
+
+```bash
+groupdel docker
+groupadd -g $DOCKER_GID docker #replace $DOCKER_GID with the value obtained above
+usermod -aG docker jenkins
+```
+
+### 3. Restart container
+
+```bash
+docker restart <jenkins_container>
+```
+
+### 4. Test
+
+```bash
+docker exec -it <jenkins_container> bash
+su - jenkins
+docker ps
+```
+
+---
+
+## Rule to remember
+
+> When mounting `/var/run/docker.sock` into a container, always match the container’s `docker` group GID to the host’s `docker` group GID.
+
+Never hardcode the number.
+
+---
+
+## Notes
+
+* Docker CLI must be installed in the Jenkins container.
+* Socket access gives Jenkins **root‑level control** of the host.
+
+---
+
+End of guide.
+
+
+Now go back to host and restart jenkins container.
