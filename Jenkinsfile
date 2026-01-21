@@ -20,7 +20,10 @@ pipeline {
         stage("deploy") {
             steps {
                 script {
-                    echo "Deploying the application...."
+                    dockerCommand = 'docker run -d -p 3080:3080 --name demo-app devjumpstart/demo-app:2.0'
+                    sshagent(['ec2_temp_machine']) {
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@98.80.144.201 ${dockerCommand}"
+                    }
                 }
             }
         }               
